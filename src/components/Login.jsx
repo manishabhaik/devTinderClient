@@ -8,17 +8,29 @@ import { BASE_URL } from "../utils/constants";
 function Login() {
   const [emailId,setEmailId] =useState("");
   const [password,setPassword] = useState("");
+  const [error,setError] = useState("")
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async()=>{
-    const res = await axios.post(BASE_URL+"/login",{
-      emailId,
-      password
-    },{withCredentials:true})
+    try{
+      const res = await axios.post(BASE_URL+"/login",{
+        emailId,
+        password
+      },{withCredentials:true})
+      
+      dispatch(addUser(res.data))
+      return navigate("/");
+
+    }catch(err){
+      if(err.response.data){
+        setError(err.response.data)
+      }else{
+        console.log(err)
+      }
+      
+    }
     
-    dispatch(addUser(res.data))
-    return navigate("/")
   }
   return (
     <div className="flex justify-center my-10">
@@ -49,6 +61,7 @@ function Login() {
               />
             </label>
           </div>
+          <p className="text-red-500">{error}</p>
           <div className="card-actions justify-end m-2">
             <button className="btn btn-primary" onClick={handleLogin}>Login</button>
           </div>
